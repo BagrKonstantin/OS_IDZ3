@@ -104,7 +104,6 @@ void printTasksInfo() {
 }
 
 void getWork(struct response *response, int programmer_id) {
-
     for (int i = 0; i < tasks_count; ++i) {
         if (tasks[i].status == NEW) {
             printf("programmer #%d has found task with id = %d for executing\n", programmer_id, tasks[i].id);
@@ -142,18 +141,6 @@ void getWork(struct response *response, int programmer_id) {
     }
 }
 
-void sendTask(struct task *task) {
-    task->status = EXECUTED;
-    tasks[task->id] = *task;
-}
-
-void sendCheckResult(struct task *task) {
-    tasks[task->id] = *task;
-    if (task->status == RIGHT) {
-        ++complete_count;
-        printf("\nComplete count = %d\n", complete_count);
-    }
-}
 
 int handleClientRequest(int clntSocket, struct request *request) {
 
@@ -172,12 +159,20 @@ int handleClientRequest(int clntSocket, struct request *request) {
         struct task task = request->task;
 
         switch (request->request_code) {
-            case 0:getWork(&response, programmer_id);
-                break;
-            case 1:sendTask(&task);
+            case 0:
                 getWork(&response, programmer_id);
                 break;
-            case 2:sendCheckResult(&task);
+            case 1:
+                task.status = EXECUTED;
+                tasks[task.id] = task;
+                getWork(&response, programmer_id);
+                break;
+            case 2:
+                tasks[task.id] = task;
+                if (task.status == RIGHT) {
+                    ++complete_count;
+                    printf("\nComplete count = %d\n", complete_count);
+                }
                 getWork(&response, programmer_id);
                 break;
             default:break;
@@ -190,7 +185,6 @@ int handleClientRequest(int clntSocket, struct request *request) {
 
     return response.response_code;
 }
-
 
 void HandleTCPClient(int clntSocket) {
     while (1) {
@@ -241,9 +235,7 @@ int main(int argc, char *argv[]) {
         printf("with thread %ld\n", (long int) threadID);
     }
 
-    printf("reached!!!\n");
-
-    printf("\n\nFINISH FINISH FINISH\n\n");
+    printf("\nFINISH\n");
     printTasksInfo();
 
     sem_destroy(&sem);
