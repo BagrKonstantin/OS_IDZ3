@@ -6,16 +6,6 @@
 #include <unistd.h>
 #include "enums.h"
 
-int programmer_id;
-
-void sendRequest(int sock, struct request *request) {
-    /* Send the current i to the server */
-    if (send(sock, (struct request *) request, sizeof(*request), 0) < 0) {
-        perror("send() bad");
-        exit(1);
-    }
-    printf("Programmer #%d has sent his request = %d to server\n", programmer_id, request->request_code);
-}
 
 int main(int argc, char *argv[]) {
     int sock;
@@ -23,9 +13,7 @@ int main(int argc, char *argv[]) {
     unsigned short echoServPort;
     char *servIP;
 
-    programmer_id = -1;
-
-    programmer_id = atoi(argv[1]);
+    int programmer_id = atoi(argv[1]);
     servIP = argv[2];
     echoServPort = atoi(argv[3]);
 
@@ -49,7 +37,11 @@ int main(int argc, char *argv[]) {
 
     while (1) {
 
-        sendRequest(sock, &request);
+        if (send(sock, &request, sizeof(request), 0) < 0) {
+            perror("send() bad");
+            exit(1);
+        }
+        printf("Programmer #%d has sent his request = %d to server\n", programmer_id, request.request_code);
 
         struct response response = {-1, -1, -1, -1};
         if (recv(sock, &response, sizeof(response), 0) < 0) {

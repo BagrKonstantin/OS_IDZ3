@@ -191,19 +191,15 @@ int handleClientRequest(int clntSocket, struct request *request) {
     return response.response_code;
 }
 
-void receiveRequest(int sock, struct request *request) {
-    if (recv(sock, (struct request *) request, sizeof(*request), 0) < 0) {
-        perror("recv() bad");
-        exit(1);
-    }
-}
 
 void HandleTCPClient(int clntSocket) {
     while (1) {
         struct request request = {-1, -1, -1};
 
-        receiveRequest(clntSocket, &request);
-
+        if (recv(clntSocket, &request, sizeof(request), 0) < 0) {
+            perror("receive bad");
+            exit(1);
+        }
         if (handleClientRequest(clntSocket, &request) == FINISH) {
             break;
         }
