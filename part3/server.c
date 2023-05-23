@@ -5,7 +5,7 @@
 
 #define MAX_TASK_COUNT 10
 #define MAX_PROGRAMMERS_CONNECTIONS 3
-#define MAX_LOGGERS_CONNECTIONS 1
+#define MAX_LOGGERS_CONNECTIONS 10
 
 void HandleTCPProgrammerClient(int clntSocket, int port);
 void HandleTCPLoggerClient(int clntSocket, int port);
@@ -146,7 +146,8 @@ int CreateTCPServerSocket(unsigned short port, int max_connections)
         exit(1);
     }
 
-    if (listen(sock, max_connections) < 0) {
+    if (listen(sock, max_connections) < 0)
+    {
         perror("listen() failed");
         exit(1);
     }
@@ -265,7 +266,6 @@ void getWork(struct response *response, int programmer_id)
     }
 }
 
-
 void sendCheckResult(struct task *task)
 {
     tasks[task->id] = *task;
@@ -345,6 +345,7 @@ int m_index = 0;
 
 void HandleTCPProgrammerClient(int clntSocket, int port)
 {
+
     while (1)
     {
         struct request request = {-1, -1, -1};
