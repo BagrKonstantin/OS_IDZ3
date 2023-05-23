@@ -11,17 +11,23 @@ int main(int argc, char *argv[]) {
     servIP = argv[2];
     echoServPort = atoi(argv[3]);
 
-    if (connect(sock, (struct sockaddr *) &echoServAddr, sizeof(echoServAddr)) < 0) {
-        perror("connect failed");
+    if ((sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
+    {
+        perror("socket() failed");
         exit(1);
     }
+
+
 
     memset(&echoServAddr, 0, sizeof(echoServAddr));
     echoServAddr.sin_family = AF_INET;
     echoServAddr.sin_addr.s_addr = inet_addr(servIP);
     echoServAddr.sin_port = htons(echoServPort);
 
-
+    if (connect(sock, (struct sockaddr *) &echoServAddr, sizeof(echoServAddr)) < 0) {
+        perror("connect failed");
+        exit(1);
+    }
 
     struct task task = {-1, -1, -1, -1};
     struct request request = {GET_WORK, programmer_id, task};

@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
     echoServPort = atoi(argv[3]);
 
     if ((sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
-        perror("socket() failed");
+        perror("socket failed");
         exit(1);
     }
 
